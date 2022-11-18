@@ -10,12 +10,15 @@ public class Fruit : MonoBehaviour
     /// <summary>選択状態表示Sprite</summary>
     public GameObject SelectSprite;
 
+    /// <summary>選択状態</summary>
+    public bool IsSelect { get; private set; }
+
     /// <summary>
     /// OnMouseDownイベント
     /// </summary>
     private void OnMouseDown()
     {
-        SelectSprite.SetActive(true);
+        levelManager.Instance.FruitDown(this);
     }
 
     /// <summary>
@@ -23,7 +26,7 @@ public class Fruit : MonoBehaviour
     /// </summary>
     private void OnMouseEnter()
     {
-        
+        levelManager.Instance.FruitEnter(this);
     }
 
     /// <summary>
@@ -31,6 +34,12 @@ public class Fruit : MonoBehaviour
     /// </summary>
     private void OnMouseUp()
     {
-        SelectSprite.SetActive(false);
+        levelManager.Instance.FruitUp();
+    }
+
+    public void SetIsSelect(bool isSelect)
+    {
+        IsSelect = isSelect;
+        SelectSprite.SetActive(isSelect);
     }
 }
