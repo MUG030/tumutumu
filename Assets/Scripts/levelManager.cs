@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class levelManager : MonoBehaviour
 {
+
+    private List<Fruit> _AllFruits = new List<Fruit>();
+
     /// <summary>選択中のフルーツ</summary>
     private List<Fruit> _SelectFruites = new List<Fruit>();
 
@@ -15,11 +19,23 @@ public class levelManager : MonoBehaviour
 
     public GameObject[] FruitPrefabs;
 
+    /// <summary>選択線描画オブジェクト</summary>
+    public LineRenderer LineRenderer;
+
+    /// <summary>ボムPrefab</summary>
+    public GameObject BomPrefab;
+
     /// <summary>フルーツを3つ繋げないと消せない</summary>
     public int FruitDestroyCount = 3;
 
     /// <summary>フルーツを繋ぐ範囲</summary>
     public float FruitConnectRange = 1.5f;
+
+    /// <summary>ボムを生成するために必要なフルーツの数</summary>
+    public int BomSpawnCount = 5;
+
+    /// <summary>ボムで消す範囲</summary>
+    public float BomDeatroyRange = 1.5f;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +47,21 @@ public class levelManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        LineRendererUpdate();
+    }
+
+    /// <summary>
+    /// 選択中のフルーツを繋ぐ線の描画を更新
+    /// </summary>
+    private void LineRendererUpdate()
+    {
+        if (_SelectFruites.Count >= 2)
+        {
+            LineRenderer.positionCount = _SelectFruites.Count;
+            LineRenderer.SetPositions(_SelectFruites.Select(fruit => fruit.transform.position).ToArray());
+            LineRenderer.gameObject.SetActive(true);
+        }
+        else LineRenderer.gameObject.SetActive(false);
     }
 
     /// <summary>
@@ -49,7 +79,8 @@ public class levelManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             var Position = new Vector3(StartX + X, StartY + Y, 0);
-            Instantiate(FruitPrefabs[Random.Range(0, FruitPrefabs.Length)], Position, Quaternion.identity);
+            var FruitObject = Instantiate(FruitPrefabs[Random.Range(0, FruitPrefabs.Length)], Position, Quaternion.identity);
+            _AllFruits.Add(FruitObject.GetComponent<Fruit>());
 
             X++;
             if(X==MaxX)
@@ -73,7 +104,7 @@ public class levelManager : MonoBehaviour
     }
 
     /// <summary>
-    /// FruitDownイベント
+    /// FruitEnterイベント
     /// </summary>
     /// <param name="fruit">フルーツ</param>
     public void FruitEnter(Fruit fruit)
@@ -82,19 +113,76 @@ public class levelManager : MonoBehaviour
 
         if (fruit.IsSelect)
         {
-
+            if(_SelectFruites.Count >= 2 && _SelectFruites[_SelectFruites.Count -2] == fruit)
+            {
+                var RemoveFruit = _SelectFruites[_SelectFruites.Count - 1];
+                RemoveFruit.SetIsSelect(false);
+                _SelectFruites.Remove(RemoveFruit);
+            }
         }
         else
         {
-            
+            var Length = (_SelectFruites[_SelectFruites.Count -1].transform.position - fruit.transform.position ).magnitude;
+            if(Length < FruitConnectRange)
+            {
+                _SelectFruites.Add(fruit);
+                fruit.SetIsSelect(true);
+            }
         }
     }
 
     /// <summary>
-    /// FruitDownイベント
+    /// FruitUpイベント
     /// </summary>
     public void FruitUp()
     {
+        if(_SelectFruites.Count >= FruitDestroyCount)
+        {
+            DestroyFruits(_SelectFruites);
+            if (_SelectFruites.Count >= BomSpawnCount)
+                Instantiate(BomPrefab, _SelectFruites[_SelectFruites.Count -1].transform.position, Quaternion.identity);
+        }
+        else
+        {
+            foreach (var FruitItem in _SelectFruites)
+                FruitItem.SetIsSelect(false);
+        }
 
+        _SelectID = "";
+        _SelectFruites.Clear();
+    }
+
+    /// <summary>
+    /// ボムを押した
+    /// </summary>
+    /// <param name="bom"></param>
+    public void BomDown(Bom bom)
+    {
+        var RemoveFruits = new List<Fruit>();
+
+        foreach(var FruitItem in _AllFruits)
+        {
+            var Length = (FruitItem.transform.position - bom.transform.position).magnitude;
+            if (Length < BomDeatroyRange)
+                RemoveFruits.Add(FruitItem);
+        }
+
+        DestroyFruits(RemoveFruits);
+        Destroy(bom.gameObject);
+    }
+
+    /// <summary>
+    /// フルーツを探す
+    /// </summary>
+    /// <param name="fruits"></param>
+    private void DestroyFruits(List<Fruit> fruits)
+    {
+        foreach(var FruitItem in fruits)
+        {
+            Destroy(FruitItem.gameObject);
+            _AllFruits.Remove(FruitItem);
+        }
+
+        FruitSpawn(fruits.Count);
     }
 }

@@ -37,6 +37,10 @@ public class Fruit : MonoBehaviour
         levelManager.Instance.FruitUp();
     }
 
+    /// <summary>
+    /// ‘I‘ğó‘Ô‚ğİ’è
+    /// </summary>
+    /// <param name="isSelect"></param>
     public void SetIsSelect(bool isSelect)
     {
         IsSelect = isSelect;
