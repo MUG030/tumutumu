@@ -92,7 +92,6 @@ GameObject:
   m_Component:
   - component: {fileID: 7906965691034755319}
   - component: {fileID: 2607412369779326174}
-  - component: {fileID: 616796564576544743}
   - component: {fileID: -2692721606237758309}
   - component: {fileID: 8772988970402778288}
   - component: {fileID: 7972155268155082942}
@@ -169,20 +168,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &616796564576544743
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8740788195808738435}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f407c39bdbfd9ff43bf6c2224d91eb39, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ID: Lemon
-  SelectSprite: {fileID: 327454003085524853}
 --- !u!58 &-2692721606237758309
 CircleCollider2D:
   m_ObjectHideFlags: 0
