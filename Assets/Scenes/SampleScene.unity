@@ -1638,7 +1638,7 @@ MonoBehaviour:
   FruitConnectRange: 1.5
   BomSpawnCount: 5
   BomDeatroyRange: 1.5
-  PlayTime: 6
+  PlayTime: 60
 --- !u!4 &1950522868
 Transform:
   m_ObjectHideFlags: 0
